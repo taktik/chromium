@@ -14,9 +14,13 @@
 
 struct AVCodecContext;
 struct AVFrame;
+struct AVFilterGraph;
+struct AVFilterContext;
 struct AVPacket;
 
 namespace media {
+
+class MediaLog;
 
 class MEDIA_EXPORT FFmpegDecodingLoop {
  public:
@@ -43,12 +47,15 @@ class MEDIA_EXPORT FFmpegDecodingLoop {
   // decoding errors should be non-fatal, set |continue_on_decoding_errors| to
   // true; note: send packet failures are always fatal.
   FFmpegDecodingLoop(AVCodecContext* context,
-                     bool continue_on_decoding_errors = false);
+                   MediaLog* media_log = NULL,
+                   bool continue_on_decoding_errors = false);
   ~FFmpegDecodingLoop();
 
   // Callback issued when the decoding loop has produced a frame. |frame| is
   // owned by the decoding loop. Return true to continue the decoding loop.
   using FrameReadyCB = base::RepeatingCallback<bool(AVFrame* frame)>;
+
+  void InitFilterGraph(AVFrame *frame);
 
   // Spins a generic decoding which decodes all available frames and sends them
   // to |frame_ready_cb| given a single input |packet|. Returns an enum with
@@ -64,9 +71,15 @@ class MEDIA_EXPORT FFmpegDecodingLoop {
   int last_averror_code() const { return last_averror_code_; }
 
  private:
+  MediaLog* media_log_;
+  bool filter_initialised = false;
   const bool continue_on_decoding_errors_;
   AVCodecContext* const context_;
+  AVFilterContext *buffersink_ctx_;
+  AVFilterContext *buffersrc_ctx_;
+  AVFilterGraph* filter_graph;
   std::unique_ptr<AVFrame, ScopedPtrAVFreeFrame> frame_;
+  std::unique_ptr<AVFrame, ScopedPtrAVFreeFrame> filter_frame_;
   int last_averror_code_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(FFmpegDecodingLoop);
