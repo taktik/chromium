@@ -99,6 +99,8 @@ void DefaultDecoderFactory::CreateVideoDecoders(
   if (is_shutdown_)
     return;
 
+  DVLOG(1) << "taktik -- in default decoder factory";
+
 #if !defined(OS_ANDROID)
   video_decoders->push_back(
       std::make_unique<DecryptingVideoDecoder>(task_runner, media_log));
@@ -134,6 +136,12 @@ void DefaultDecoderFactory::CreateVideoDecoders(
   }
 #endif
 
+
+#if BUILDFLAG(ENABLE_FFMPEG_VIDEO_DECODERS)
+  video_decoders->push_back(std::make_unique<FFmpegVideoDecoder>(media_log));
+#endif
+
+
 #if BUILDFLAG(ENABLE_LIBVPX)
   video_decoders->push_back(std::make_unique<OffloadingVpxVideoDecoder>());
 #endif
@@ -152,10 +160,6 @@ void DefaultDecoderFactory::CreateVideoDecoders(
     video_decoders->push_back(std::make_unique<AomVideoDecoder>(media_log));
 #endif
   }
-
-#if BUILDFLAG(ENABLE_FFMPEG_VIDEO_DECODERS)
-  video_decoders->push_back(std::make_unique<FFmpegVideoDecoder>(media_log));
-#endif
 }
 
 void DefaultDecoderFactory::Shutdown() {

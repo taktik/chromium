@@ -396,7 +396,7 @@ bool FFmpegVideoDecoder::ConfigureDecoder(const VideoDecoderConfig& config,
     return false;
   }
 
-  decoding_loop_.reset(new FFmpegDecodingLoop(codec_context_.get()));
+  decoding_loop_.reset(new FFmpegDecodingLoop(codec_context_.get(), media_log_));
   return true;
 }
 

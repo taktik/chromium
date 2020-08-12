@@ -352,7 +352,7 @@ bool FFmpegAudioDecoder::ConfigureDecoder(const AudioDecoderConfig& config) {
     return false;
   }
 
-  decoding_loop_.reset(new FFmpegDecodingLoop(codec_context_.get(), true));
+  decoding_loop_.reset(new FFmpegDecodingLoop(codec_context_.get(), media_log_, true));
   ResetTimestampState(config);
   return true;
 }

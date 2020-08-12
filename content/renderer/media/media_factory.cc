@@ -650,7 +650,8 @@ media::DecoderFactory* MediaFactory::GetDecoderFactory() {
     std::unique_ptr<media::DecoderFactory> external_decoder_factory;
 #if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) || BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
     external_decoder_factory.reset(
-        new media::MojoDecoderFactory(GetMediaInterfaceFactory()));
+        //new media::MojoDecoderFactory(GetMediaInterfaceFactory()));
+        new media::DefaultDecoderFactory(std::move(external_decoder_factory)));
 #endif
     decoder_factory_.reset(
         new media::DefaultDecoderFactory(std::move(external_decoder_factory)));
