@@ -99,8 +99,6 @@ void DefaultDecoderFactory::CreateVideoDecoders(
   if (is_shutdown_)
     return;
 
-  DVLOG(1) << "taktik -- in default decoder factory";
-
 #if !defined(OS_ANDROID)
   video_decoders->push_back(
       std::make_unique<DecryptingVideoDecoder>(task_runner, media_log));

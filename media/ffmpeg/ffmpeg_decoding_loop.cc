@@ -80,7 +80,7 @@ void FFmpegDecodingLoop::InitFilterGraph(AVFrame *frame) {
     outputs->next       = NULL;
 
     result = avfilter_graph_parse_ptr(filter_graph, description, &inputs, &outputs, NULL);
-    if (result < 0 && media_log_) MEDIA_LOG(ERROR, media_log_) << "Filter graph - avfilter_graph_parse_ptr ERROR";
+    if (result < 0 && media_log_) MEDIA_LOG(ERROR, media_log_) << "Filter graph - avfilter_graph_parse_ptr ERROR : " << result;
 
     result = avfilter_graph_config(filter_graph, NULL);
     if (result < 0 && media_log_) MEDIA_LOG(ERROR, media_log_) << "Filter graph - avfilter_graph_config error";
@@ -129,7 +129,7 @@ FFmpegDecodingLoop::DecodeStatus FFmpegDecodingLoop::DecodePacket(
     }
 
     bool frame_processing_success = false;
-    if (!frame_.get()->interlaced_frame) {     // not interlaced
+    if (!frame_.get()->interlaced_frame) {  
           if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "Detected not interlaced video frame";
           frame_processing_success = frame_ready_cb.Run(frame_.get());
     } else {
@@ -152,10 +152,8 @@ FFmpegDecodingLoop::DecodeStatus FFmpegDecodingLoop::DecodePacket(
         const int ret = av_buffersink_get_frame(buffersink_ctx_, filter_frame_.get());
         if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "ret = " << ret;
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){
-          if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "ret error but waitning for more frames" << ret;
+          if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "ret error but waiting for more frames : " << ret;
           frame_processing_success = true;
-          if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "ret error but waitning for more frames ; filter description = " << buffersink_ctx_->filter->description;
-        
           break;
         }
         
@@ -163,11 +161,12 @@ FFmpegDecodingLoop::DecodeStatus FFmpegDecodingLoop::DecodePacket(
           if (!continue_on_decoding_errors_)
             return DecodeStatus::kDecodeFrameFailed;
           decoder_error = true;
+          frame_processing_success = true;
           break;
         }
-        
-        if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "producing interlaced frame";
-        frame_processing_success = frame_ready_cb.Run(frame_.get());
+
+        frame_processing_success = frame_ready_cb.Run(filter_frame_.get());
+        if (media_log_) MEDIA_LOG(DEBUG, media_log_) << "producing deinterlaced frame : " << frame_processing_success;
         av_frame_unref(filter_frame_.get());
       }
     }
