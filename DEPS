@@ -180,6 +180,7 @@ vars = {
   'aomedia_git': 'https://aomedia.googlesource.com',
   'boringssl_git': 'https://boringssl.googlesource.com',
   'chromium_git': 'https://chromium.googlesource.com',
+  'third_party_ffmpeg_git' : 'https://github.com/taktik/chromium-thirdparty-ffmpeg',
   'dawn_git': 'https://dawn.googlesource.com',
   'pdfium_git': 'https://pdfium.googlesource.com',
   'quiche_git': 'https://quiche.googlesource.com',
@@ -907,7 +908,7 @@ deps = {
   },
 
   'src/third_party/ffmpeg':
-    Var('chromium_git') + '/chromium/third_party/ffmpeg.git' + '@' + '23b2a15c2595925c8ec0d3be9a51ec3257281bd1',
+    Var('third_party_ffmpeg_git') + '.git@' + '39452785b6766e7ee6f643849e1f00da6220ec3f',
 
   'src/third_party/flac':
     Var('chromium_git') + '/chromium/deps/flac.git' + '@' + 'af862024c8c8fa0ae07ced05e89013d881b00596',
