@@ -59,7 +59,7 @@ void FFmpegDecodingLoop::InitFilterGraph(AVFrame *frame) {
     }
 
     AVBufferSinkParams *params = av_buffersink_params_alloc();
-    enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE };
+    enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_YUYV422, AV_PIX_FMT_NONE };
 
     params->pixel_fmts = pix_fmts;
     result = avfilter_graph_create_filter(&buffersink_ctx_, buffer_sink, "out", NULL, params, filter_graph);
